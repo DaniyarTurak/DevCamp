@@ -6,6 +6,7 @@ const dotenv = require('dotenv'); // нужен для доступа к .env д
 //const logger = require('./middleware/logger')
 const morgan = require('morgan');
 const colors = require('colors');
+const errorHandler = require('./middleware/error');
 const connectDb = require('./config/db');
 //Load env values
 dotenv.config({ path: './config/config.env' });
@@ -18,14 +19,20 @@ const bootcamps = require('./routes/bootcamps');
 
 const app = express();
 
+// Body parser
+app.use(express.json());
+
 // app.use(logger);
 // Dev logging middleware
-//if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
-//}
+}
 
 // Mount routess
 app.use('/api/v1/bootcamps', bootcamps);
+
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
