@@ -19,7 +19,7 @@ const bootcamps = require('./routes/bootcamps');
 
 const app = express();
 
-// Body parser
+// Body parser (raw json in postman converting it)
 app.use(express.json());
 
 // app.use(logger);
