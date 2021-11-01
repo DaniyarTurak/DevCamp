@@ -8,7 +8,8 @@ const {
     createBootcamp,
     updateBootcamp, 
     deleteBootcamp,
-    getBootcampsInRadius
+    getBootcampsInRadius,
+    bootcampPhotoUpload
 } = require('../controllers/bootcamps');
 
 
@@ -19,6 +20,7 @@ const router = express.Router(); // app = expresSs)
 
 //Re-route into other resourse routers
 router.use('/:bootcampId/courses', courseRouter);
+router.route('/:id/photo').put(bootcampPhotoUpload);
 
 router
     .route('/')

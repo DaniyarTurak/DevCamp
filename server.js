@@ -1,11 +1,14 @@
 // npm i express dorenv; npm run dev; npm i morgan
 /* jshint node:true */
 /*jshint esversion: 6 */
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv'); // нужен для доступа к .env датам
 //const logger = require('./middleware/logger')
 const morgan = require('morgan');
 const colors = require('colors');
+//npm i express-fileupload
+const fileupload = require('express-fileupload');
 const errorHandler = require('./middleware/error');
 const connectDb = require('./config/db');
 //Load env values
@@ -29,10 +32,16 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+
+//File uploading
+app.use(fileupload());
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Mount routess
 app.use('/api/v1/bootcamps', bootcamps);
 app.use('/api/v1/courses', courses);
-
 
 app.use(errorHandler);
 
