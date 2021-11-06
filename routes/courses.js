@@ -13,12 +13,17 @@ const advancedResults = require('../middleware/advancedResults');
 
 const router = express.Router({ mergeParams: true });
 
+const { protect, authorize } = require('../middleware/auth');
+
 router.route('/')
     .get(advancedResults(Course, { // additional info, besides id
         path: 'bootcamp',
         select: 'name description' //name and descrption
     }), getCourses)
-    .post(addCourse);// bootcamp router has :bootcampid/courses ,it will transfer here because it is post
-router.route('/:id').get(getCourse).put(updateCourse).delete(deleteCourse); 
+    .post(protect, authorize('publisher', 'admin'), addCourse);// bootcamp router has :bootcampid/courses ,it will transfer here because it is post
+router.route('/:id')
+    .get(getCourse)
+    .put(protect, authorize('publisher', 'admin'), updateCourse)
+    .delete(protect,authorize('publisher', 'admin'),  deleteCourse); 
 
 module.exports = router;

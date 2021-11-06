@@ -16,13 +16,8 @@ exports.register = asyncHandler(async (req, res, next) => {
         role
     });
 
-    // Create token 
-    const token = user.getSignedJwtToken();
-
-    res.status(200).json({
-        success: true,
-        token: token
-    });
+    // Send cookie with token in it
+    sendTokenResponse(user, 200, res);
 });
 
 // @desc    Login user
@@ -52,11 +47,42 @@ exports.login = asyncHandler(async (req, res, next) => {
         next(new ErrorResponse(`Invalid credentail`, 401));
     }
 
-    // Create token 
+    sendTokenResponse(user, 200, res);
+});
+
+
+// Get token from model, create cookie, send response
+const sendTokenResponse = (user, statusCode, res) => {
+    //Create token
     const token = user.getSignedJwtToken();
+
+    const options = {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000), // 30 days
+        httpOnly: true // only access client side script
+    };
+
+
+    if (process.env.NODE_ENV === 'production') {
+        options.secure = true; // secure flag
+    }
+
+    res
+        .status(statusCode)
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            token: token
+        });
+};
+
+// @desc    Get current logged in user
+// @route   POST /api/v1/auth/me
+// @access  Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
 
     res.status(200).json({
         success: true,
-        token: token
+        data: user
     });
 });

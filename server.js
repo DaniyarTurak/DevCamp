@@ -9,6 +9,7 @@ const morgan = require('morgan');
 const colors = require('colors');
 //npm i express-fileupload
 const fileupload = require('express-fileupload');
+const cookieParser = require('cookie-parser');
 const errorHandler = require('./middleware/error');
 const connectDb = require('./config/db');
 //Load env values
@@ -26,6 +27,9 @@ const app = express();
 
 // Body parser (raw json in postman converting it)
 app.use(express.json());
+
+// Cookie parser
+app.use(cookieParser());
 
 // app.use(logger);
 // Dev logging middleware
