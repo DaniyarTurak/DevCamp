@@ -50,6 +50,41 @@ exports.login = asyncHandler(async (req, res, next) => {
     sendTokenResponse(user, 200, res);
 });
 
+// @desc    Get current logged in user
+// @route   POST /api/v1/auth/me
+// @access  Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success: true,
+        data: user
+    });
+});
+
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgotpassword
+// @access  Public
+exports.forgotPassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+        next(new ErrorResponse(`There is no user with that email`, 404));
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+
+    // we store it in hash version in db, but when sending it wiil be regular version, below resetToken is regular, but in db hashed
+    //console.log(resetToken);
+
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+        success: true,
+        data: user
+    });
+});
 
 // Get token from model, create cookie, send response
 const sendTokenResponse = (user, statusCode, res) => {
@@ -74,15 +109,3 @@ const sendTokenResponse = (user, statusCode, res) => {
             token: token
         });
 };
-
-// @desc    Get current logged in user
-// @route   POST /api/v1/auth/me
-// @access  Private
-exports.getMe = asyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-
-    res.status(200).json({
-        success: true,
-        data: user
-    });
-});
